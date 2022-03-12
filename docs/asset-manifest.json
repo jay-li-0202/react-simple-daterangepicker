@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/simple-daterangepicker/static/css/main.073c9b0a.css",
-    "main.js": "/simple-daterangepicker/static/js/main.3055f839.js",
+    "main.js": "/simple-daterangepicker/static/js/main.25cd33a1.js",
     "static/js/787.998be280.chunk.js": "/simple-daterangepicker/static/js/787.998be280.chunk.js",
     "index.html": "/simple-daterangepicker/index.html",
     "main.073c9b0a.css.map": "/simple-daterangepicker/static/css/main.073c9b0a.css.map",
-    "main.3055f839.js.map": "/simple-daterangepicker/static/js/main.3055f839.js.map",
+    "main.25cd33a1.js.map": "/simple-daterangepicker/static/js/main.25cd33a1.js.map",
     "787.998be280.chunk.js.map": "/simple-daterangepicker/static/js/787.998be280.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.073c9b0a.css",
-    "static/js/main.3055f839.js"
+    "static/js/main.25cd33a1.js"
   ]
 }
