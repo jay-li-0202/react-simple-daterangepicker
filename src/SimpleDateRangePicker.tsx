@@ -17,6 +17,7 @@ export interface SimpleDateRangePickerState {
     fromDateValue: string;
     toDateValue: string;
     currentCalendarDate: Date;
+    nextCalendarDate: Date;
     showCalendar: boolean;
     calendarRef: React.RefObject<any>;
 }
@@ -28,10 +29,12 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
 
     constructor(props: SimpleDateRangePickerProps) {
         super(props);
+        let now = new Date();
         this.state = {
             fromDateValue: '',
             toDateValue: '',
             currentCalendarDate: new Date(), // start with today
+            nextCalendarDate: new Date(now.getFullYear(), now.getMonth() + 1, 1),
             showCalendar: false,
             calendarRef: React.createRef(),
             fromDate: undefined,
@@ -96,23 +99,27 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
     }
 
     calendarNavigateBack(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+
         this.setState({
-            currentCalendarDate: new Date(this.state.currentCalendarDate.setMonth(this.state.currentCalendarDate.getMonth() - 1))
+            currentCalendarDate: new Date(this.state.currentCalendarDate.setMonth(this.state.currentCalendarDate.getMonth() - 1)),
+            nextCalendarDate: new Date(this.state.nextCalendarDate.setMonth(this.state.nextCalendarDate.getMonth() - 1))
         });
     }
 
     calendarNavigateNext(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
         this.setState({
-            currentCalendarDate: new Date(this.state.currentCalendarDate.setMonth(this.state.currentCalendarDate.getMonth() + 1))
+            currentCalendarDate: new Date(this.state.currentCalendarDate.setMonth(this.state.currentCalendarDate.getMonth() + 1)),
+            nextCalendarDate: new Date(this.state.nextCalendarDate.setMonth(this.state.nextCalendarDate.getMonth() + 1)),
         });
     }
 
-    getCurrentCalendarDateDaysInMonth(): number {
-        return new Date(this.state.currentCalendarDate.getFullYear(), this.state.currentCalendarDate.getMonth() + 1, 0).getDate();
+    getCalendarDateDaysInMonth(date: Date): number {
+        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
     }
 
     dayClicked(e: React.MouseEvent<HTMLDivElement, MouseEvent>, day: number): void {
 
+        // change this to support current and next
         let newDate = new Date(this.state.currentCalendarDate);
         newDate.setDate(day);
 
@@ -168,7 +175,7 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                     onChangeTo(newDate);
                 }
             }
-                // otherwise set the from date again
+            // otherwise set the from date again
             else {
                 this.setState({
                     fromDate: newDate,
@@ -182,12 +189,13 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
         }
     }
 
-    render() {
+    getWeeks(date: Date): Array<number[]> {
+        let weeks: Array<number[]> = [];
 
-        let daysInMonth = this.getCurrentCalendarDateDaysInMonth();
-        let weeks : Array<number[]> = [];
+        date = new Date(date);
+
+        let daysInMonth = this.getCalendarDateDaysInMonth(date);
         let firstWeek = [];
-        let date = new Date(this.state.currentCalendarDate);
         date.setDate(1);
         let dayOfWeek = date.getDay();
 
@@ -233,6 +241,14 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
             weeks.push(finalWeek);
         }
 
+        return weeks;
+    }
+
+    render() {
+
+        let currentCalendarWeeks = this.getWeeks(this.state.currentCalendarDate);
+        let nextCalendarWeeks = this.getWeeks(this.state.nextCalendarDate);
+
         let weekDayNames = [
             'Su',
             'Mo',
@@ -244,7 +260,7 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
         ];
 
         return (
-            <div id="parentElement" ref={this.state.calendarRef} style={{width: '500px'}}>
+            <div id="parentElement" ref={this.state.calendarRef} style={{ width: '500px' }}>
                 <InputMask mask="99/99/9999" onChange={(e) => this.onChangeFrom(e)} value={this.state.fromDateValue}>
                     {() => <TextField id="outlined-basic" label="From" variant="outlined" />}
                 </InputMask>
@@ -252,61 +268,118 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                     {() => <TextField id="outlined-basic" label="To" variant="outlined" />}
                 </InputMask>
 
-                <Paper style={{ padding: '24px', width: '300px', textAlign: 'center', display: this.state.showCalendar ? 'block' : 'none' }}>
-                    <div style={{float: 'left', width: '100%'}}>
-                    <Button onClick={(e) => { this.calendarNavigateBack(e) }} style={{ float: 'left' }}>
-                        <NavigateBeforeIcon />
-                    </Button>
-                        <span style={{fontWeight: '700'}}>{this.state.currentCalendarDate.toLocaleString('default', { month: 'long' })} {this.state.currentCalendarDate.toLocaleString('default', { year: 'numeric' })}</span>
+                <Paper style={{ padding: '24px', width: '600px', textAlign: 'center', display: this.state.showCalendar ? 'block' : 'none' }}>
+                    <div style={{ float: 'left', width: '100%' }}>
+                        <Button onClick={(e) => { this.calendarNavigateBack(e) }} style={{ float: 'left' }}>
+                            <NavigateBeforeIcon />
+                        </Button>
+                        <span style={{ fontWeight: '700', marginRight: '30%' }}>
+                            {this.state.currentCalendarDate.toLocaleString('default', { month: 'long' })} {this.state.currentCalendarDate.toLocaleString('default', { year: 'numeric' })}
+                        </span>
+                        <span style={{ fontWeight: '700' }}>
+                            {this.state.nextCalendarDate.toLocaleString('default', { month: 'long' })} {this.state.nextCalendarDate.toLocaleString('default', { year: 'numeric' })}
+                        </span>
                         <Button onClick={(e) => { this.calendarNavigateNext(e) }} style={{ float: 'right' }}>
-                        <NavigateNextIcon />
-                    </Button>
+                            <NavigateNextIcon />
+                        </Button>
                     </div>
-                    <div style={{ display: 'inline-block' }}>
-                    {
-                        weekDayNames.map(name => {
-                            return (
-                                <Paper key={name} sx={{borderColor: 'white'}} variant="outlined" style={{ display: 'inline-block', width: '36px', height: '36px', textAlign: 'center', color: '#999' }}>{name}</Paper>
+
+                    {/*Current Calendar*/}
+                    <div style={{ display: 'inline-block', padding: '12px' }}>
+                        <div style={{ display: 'block' }}>
+                        {
+                            weekDayNames.map(name => {
+                                return (
+                                    <Paper key={name} sx={{ borderColor: 'white' }} variant="outlined" style={{ display: 'inline-block', width: '36px', height: '36px', textAlign: 'center', color: '#999' }}>{name}</Paper>
                                 );
-                        })
-                    }
+                            })
+                        }
+                        </div>
+                        <div style={{ display: 'inline-block' }}>
+                            {
+                                currentCalendarWeeks.map((week, index) => {
+                                    return (
+                                        <div key={index} style={{ display: 'block', textAlign: 'left' }}>
+                                            {
+                                                week.map(day => {
+                                                    let date = new Date(this.state.currentCalendarDate);
+
+                                                    let doesntStartSunday = index == 0 && week[0] > 10 && day > 10;
+
+                                                    date.setDate(day);
+                                                    let dateFormatted = date ? format(date, 'MM/dd/yyyy') : undefined;
+
+                                                    let fromDateFormatted = this.state.fromDate && isValid(this.state.fromDate) ? format(this.state.fromDate, 'MM/dd/yyyy') : undefined;
+                                                    let toDateFormatted = this.state.toDate && isValid(this.state.toDate) ? format(this.state.toDate, 'MM/dd/yyyy') : undefined;
+
+                                                    return <Paper key={day} onClick={(e) => { this.dayClicked(e, day) }} variant="outlined" style={{
+                                                        backgroundColor: dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? '#265b5f' :
+                                                            this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? '#1EA1A1' : '#fff',
+                                                        display: 'inline-block', width: '36px', height: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
+                                                    }}>{day}</Paper>
+                                                })
+                                            }
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
+
+                    {/*Next Calendar*/}
                     <div style={{ display: 'inline-block' }}>
-                    {
-                        weeks.map((week, index) => {
-                            return (
-                                <div key={index} style={{ display: 'block', textAlign: 'left' }}>
-                                {
-                                    week.map(day => {
-                                        let date = new Date(this.state.currentCalendarDate);
+                        <div style={{ display: 'block' }}>
+                        {
+                            weekDayNames.map(name => {
+                                return (
+                                    <Paper key={name} sx={{ borderColor: 'white' }} variant="outlined" style={{ display: 'inline-block', width: '36px', height: '36px', textAlign: 'center', color: '#999' }}>{name}</Paper>
+                                );
+                            })
+                        }
+                    </div>
+                        <div style={{ display: 'inline-block' }}>
+                        {
+                                nextCalendarWeeks.map((week, index) => {
+                                return (
+                                    <div key={index} style={{ display: 'block', textAlign: 'left' }}>
+                                        {
+                                            week.map(day => {
+                                                let date = new Date(this.state.nextCalendarDate);
 
-                                        let doesntStartSunday = index == 0 && week[0] > 10 && day > 10;
+                                                let doesntStartSunday = index == 0 && week[0] > 10 && day > 10;
 
-                                        date.setDate(day);
-                                        let dateFormatted = date ? format(date, 'MM/dd/yyyy') : undefined;
+                                                date.setDate(day);
+                                                let dateFormatted = date ? format(date, 'MM/dd/yyyy') : undefined;
 
-                                        let fromDateFormatted = this.state.fromDate && isValid(this.state.fromDate) ? format(this.state.fromDate, 'MM/dd/yyyy') : undefined;
-                                        let toDateFormatted = this.state.toDate && isValid(this.state.toDate) ? format(this.state.toDate, 'MM/dd/yyyy') : undefined;
+                                                let fromDateFormatted = this.state.fromDate && isValid(this.state.fromDate) ? format(this.state.fromDate, 'MM/dd/yyyy') : undefined;
+                                                let toDateFormatted = this.state.toDate && isValid(this.state.toDate) ? format(this.state.toDate, 'MM/dd/yyyy') : undefined;
 
-                                        return <Paper key={day} onClick={(e) => { this.dayClicked(e, day) }} variant="outlined" style={{
-                                            backgroundColor: dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? '#265b5f' :
-                                                this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? '#1EA1A1' : '#fff',
-                                            display: 'inline-block', width: '36px', height: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
-                                        }}>{day}</Paper>
-                                    })
-                                }
-                            </div>
-                            )
-                        })
-                    }
+                                                return <Paper key={day} onClick={(e) => { this.dayClicked(e, day) }} variant="outlined" style={{
+                                                    backgroundColor: dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? '#265b5f' :
+                                                        this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? '#1EA1A1' : '#fff',
+                                                    display: 'inline-block', width: '36px', height: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
+                                                }}>{day}</Paper>
+                                            })
+                                        }
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
                     </div>
                     <div style={{ display: 'block' }}>
-                        <Button onClick={() => { this.setState({currentCalendarDate: new Date()})}}>
+                        <Button onClick={() => {
+                            let now = new Date();
+                            this.setState({
+                                currentCalendarDate: new Date(),
+                                nextCalendarDate: new Date(now.getFullYear(), now.getMonth() + 1, 1),
+                            });
+                        }}>
                             Today
                         </Button>
                     </div>
                 </Paper>
             </div>
-            );
+        );
     }
 }
