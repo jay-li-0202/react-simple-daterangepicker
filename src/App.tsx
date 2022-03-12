@@ -1,25 +1,44 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import TextField from '@mui/material/TextField';
+import DateRangePicker, { DateRange } from '@mui/lab/DateRangePicker';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import Box from '@mui/material/Box';
+import SimpleDateRangePicker from './SimpleDateRangePicker';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    const [value, setValue] = React.useState<DateRange<Date>>([null, null]);
+    const [fromDate, setFromDate] = React.useState<string>("");
+    const [toDate, setToDate] = React.useState<string>("");
+
+    return (
+        <>
+      <div style={{padding: '24px'}}>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DateRangePicker
+              startText="Check-in"
+              endText="Check-out"
+              value={value}
+              onChange={(newValue) => {
+                  setValue(newValue);
+              }}
+              renderInput={(startProps, endProps) => (
+                  <React.Fragment>
+                      <TextField {...startProps} />
+                      <Box sx={{ mx: 2 }}> to </Box>
+                      <TextField {...endProps} />
+                  </React.Fragment>
+              )}
+          />
+        </LocalizationProvider>
+      </div>
+            <div style={{ padding: '24px' }}>
+                <SimpleDateRangePicker onChangeFrom={(e) => { setFromDate(e.target.value); }} onChangeTo={(e) => {setToDate(e.target.value)}} />
+            </div>
+            <p>From: {fromDate}</p>
+            <p>To: {toDate}</p>
+        </>
   );
 }
 
