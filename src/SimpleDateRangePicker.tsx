@@ -185,9 +185,33 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
     render() {
 
         let daysInMonth = this.getCurrentCalendarDateDaysInMonth();
-
         let weeks : Array<number[]> = [];
-        for (var i = 7; i < daysInMonth; i += 7) {
+        let firstWeek = [];
+        let date = new Date(this.state.currentCalendarDate);
+        date.setDate(1);
+        let dayOfWeek = date.getDay();
+
+        if (dayOfWeek !== 0) {
+            for (var i = dayOfWeek; i > 0; i--) {
+                date.setDate(date.getDate() - 1);
+                firstWeek.push(date.getDate());
+            }
+        }
+
+        firstWeek = firstWeek.reverse();
+
+        if (dayOfWeek !== 0) {
+            // fill in the remainder
+            for (var i = 1; i <= 7 - dayOfWeek; i++) {
+                firstWeek.push(i);
+            }
+        }
+
+        weeks.push(firstWeek);
+
+        let initial = dayOfWeek == 0 ? 7 : dayOfWeek;
+
+        for (var i = 14 - initial; i < daysInMonth; i += 7) {
 
             let r = [];
             for (var j = i; j > i - 7; j--) {
@@ -249,11 +273,15 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                     </div>
                     <div style={{ display: 'inline-block' }}>
                     {
-                        weeks.map(week => {
-                            return (<div key={week[0]} style={{ display: 'block', textAlign: 'left' }}>
+                        weeks.map((week, index) => {
+                            return (
+                                <div key={index} style={{ display: 'block', textAlign: 'left' }}>
                                 {
                                     week.map(day => {
                                         let date = new Date(this.state.currentCalendarDate);
+
+                                        let doesntStartSunday = index == 0 && week[0] > 10 && day > 10;
+
                                         date.setDate(day);
                                         let dateFormatted = date ? format(date, 'MM/dd/yyyy') : undefined;
 
@@ -263,7 +291,7 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                                         return <Paper key={day} onClick={(e) => { this.dayClicked(e, day) }} variant="outlined" style={{
                                             backgroundColor: dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? '#265b5f' :
                                                 this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? '#1EA1A1' : '#fff',
-                                            display: 'inline-block', width: '36px', height: '36px', textAlign: 'center'
+                                            display: 'inline-block', width: '36px', height: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
                                         }}>{day}</Paper>
                                     })
                                 }
