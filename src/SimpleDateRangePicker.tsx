@@ -117,10 +117,9 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
         return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
     }
 
-    dayClicked(e: React.MouseEvent<HTMLDivElement, MouseEvent>, day: number): void {
+    dayClicked(e: React.MouseEvent<HTMLDivElement, MouseEvent>, day: number, date: Date): void {
 
-        // change this to support current and next
-        let newDate = new Date(this.state.currentCalendarDate);
+        let newDate = new Date(date);
         newDate.setDate(day);
 
         // both dates are defined, check if we're extending the to date or setting the from date
@@ -312,7 +311,7 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                                                     let fromDateFormatted = this.state.fromDate && isValid(this.state.fromDate) ? format(this.state.fromDate, 'MM/dd/yyyy') : undefined;
                                                     let toDateFormatted = this.state.toDate && isValid(this.state.toDate) ? format(this.state.toDate, 'MM/dd/yyyy') : undefined;
 
-                                                    return <Paper key={day} onClick={(e) => { this.dayClicked(e, day) }} variant="outlined" style={{
+                                                    return <Paper key={day} onClick={(e) => { this.dayClicked(e, day, this.state.currentCalendarDate) }} variant="outlined" style={{
                                                         backgroundColor: dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? '#265b5f' :
                                                             this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? '#1EA1A1' : '#fff',
                                                         display: 'inline-block', width: '36px', height: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
@@ -354,7 +353,7 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                                                 let fromDateFormatted = this.state.fromDate && isValid(this.state.fromDate) ? format(this.state.fromDate, 'MM/dd/yyyy') : undefined;
                                                 let toDateFormatted = this.state.toDate && isValid(this.state.toDate) ? format(this.state.toDate, 'MM/dd/yyyy') : undefined;
 
-                                                return <Paper key={day} onClick={(e) => { this.dayClicked(e, day) }} variant="outlined" style={{
+                                                return <Paper key={day} onClick={(e) => { this.dayClicked(e, day, this.state.nextCalendarDate) }} variant="outlined" style={{
                                                     backgroundColor: dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? '#265b5f' :
                                                         this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? '#1EA1A1' : '#fff',
                                                     display: 'inline-block', width: '36px', height: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
