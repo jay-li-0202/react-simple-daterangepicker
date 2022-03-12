@@ -6,9 +6,15 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import React from 'react';
 import { format, parse, isValid } from 'date-fns';
 
+export enum DaySelectionRangeOptions {
+    ExtendToAfterTwoClicks = 0,
+    ResetFromAterTwoClicks = 1
+}
+
 export interface SimpleDateRangePickerProps {
     onChangeFrom: (date: Date | undefined) => void;
     onChangeTo: (date: Date | undefined) => void;
+    daySelectionRangeOptions: DaySelectionRangeOptions;
 }
 
 export interface SimpleDateRangePickerState {
@@ -124,7 +130,8 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
 
         // both dates are defined, check if we're extending the to date or setting the from date
         if (this.state.fromDate !== undefined && this.state.toDate !== undefined) {
-            if (newDate > this.state.toDate) {
+
+            if (newDate > this.state.toDate && this.props.daySelectionRangeOptions == DaySelectionRangeOptions.ExtendToAfterTwoClicks) {
                 this.setState({
                     toDate: newDate,
                     toDateValue: format(newDate, 'MM/dd/yyyy')
