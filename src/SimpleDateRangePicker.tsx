@@ -7,8 +7,8 @@ import React from 'react';
 import { format } from 'date-fns';
 
 export interface SimpleDateRangePickerProps {
-    onChangeFrom: ChangeEventHandler<HTMLInputElement>;
-    onChangeTo: ChangeEventHandler<HTMLInputElement>;
+    onChangeFrom: (date: Date | undefined) => void;
+    onChangeTo: (date: Date | undefined) => void;
 }
 
 export interface SimpleDateRangePickerState {
@@ -51,14 +51,9 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
     }
 
     onChangeFrom(e: React.ChangeEvent<HTMLInputElement>): void {
-        // get the user callback
         const { onChangeFrom } = this.props;
-
-        // if it exists
         if (onChangeFrom) {
-
-            // call it
-            onChangeFrom(e);
+            onChangeFrom(new Date(e.target.value));
         }
 
         this.setState({
@@ -67,14 +62,9 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
     }
 
     onChangeTo(e: React.ChangeEvent<HTMLInputElement>): void {
-        // get the user callback
         const { onChangeTo } = this.props;
-
-        // if it exists
         if (onChangeTo) {
-
-            // call it
-            onChangeTo(e);
+            onChangeTo(new Date(e.target.value));
         }
 
         this.setState({
@@ -103,12 +93,17 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
         let newDate = new Date(this.state.currentCalendarDate);
         newDate.setDate(day);
 
+        // both dates are defined, check if we're extending the to date or setting the from date
         if (this.state.fromDate !== undefined && this.state.toDate !== undefined) {
             if (newDate > this.state.toDate) {
                 this.setState({
                     toDate: newDate,
                     toDateValue: format(newDate, 'MM/dd/yyyy')
                 });
+                const { onChangeTo } = this.props;
+                if (onChangeTo) {
+                    onChangeTo(newDate);
+                }
             }
             else {
                 this.setState({
@@ -117,20 +112,49 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                     toDate: undefined,
                     toDateValue: ''
                 });
+                const { onChangeFrom } = this.props;
+                if (onChangeFrom) {
+                    onChangeFrom(newDate);
+                }
+                const { onChangeTo } = this.props;
+                if (onChangeTo) {
+                    onChangeTo(undefined);
+                }
             }
         }
         else {
+
+            // the from date isn't set, start with that
             if (this.state.fromDate === undefined) {
                 this.setState({
                     fromDate: newDate,
                     fromDateValue: format(newDate, 'MM/dd/yyyy')
                 });
+                const { onChangeFrom } = this.props;
+                if (onChangeFrom) {
+                    onChangeFrom(newDate);
+                }
             }
-            else {
+            else if (this.state.fromDate?.getDate() < day) {
                 this.setState({
                     toDate: newDate,
                     toDateValue: format(newDate, 'MM/dd/yyyy')
                 });
+                const { onChangeTo } = this.props;
+                if (onChangeTo) {
+                    onChangeTo(newDate);
+                }
+            }
+                // otherwise set the from date again
+            else {
+                this.setState({
+                    fromDate: newDate,
+                    fromDateValue: format(newDate, 'MM/dd/yyyy')
+                });
+                const { onChangeFrom } = this.props;
+                if (onChangeFrom) {
+                    onChangeFrom(newDate);
+                }
             }
         }
     }
@@ -206,7 +230,17 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                             return (<div style={{ display: 'block', textAlign: 'left' }}>
                                 {
                                     week.map(day => {
-                                        return <Paper onClick={(e) => { this.dayClicked(e, day) }} variant="outlined" style={{ display: 'inline-block', width: '36px', height: '36px', textAlign: 'center' }}>{day}</Paper>
+                                        let date = new Date(this.state.currentCalendarDate);
+                                        date.setDate(day);
+                                        let dateFormatted = date ? format(date, 'MM/dd/yyyy') : undefined;
+                                        let fromDateFormatted = this.state.fromDate ? format(this.state.fromDate, 'MM/dd/yyyy') : undefined;
+                                        let toDateFormatted = this.state.toDate ? format(this.state.toDate, 'MM/dd/yyyy') : undefined;
+
+                                        return <Paper onClick={(e) => { this.dayClicked(e, day) }} variant="outlined" style={{
+                                            backgroundColor: dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? '#265b5f' :
+                                                this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? '#1EA1A1' : '#fff',
+                                            display: 'inline-block', width: '36px', height: '36px', textAlign: 'center'
+                                        }}>{day}</Paper>
                                     })
                                 }
                             </div>

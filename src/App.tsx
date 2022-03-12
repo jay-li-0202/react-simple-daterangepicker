@@ -6,6 +6,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import Box from '@mui/material/Box';
 import SimpleDateRangePicker from './SimpleDateRangePicker';
+import { format } from 'date-fns';
 
 function App() {
     const [value, setValue] = React.useState<DateRange<Date>>([null, null]);
@@ -34,7 +35,7 @@ function App() {
         </LocalizationProvider>
       </div>
             <div style={{ padding: '24px' }}>
-                <SimpleDateRangePicker onChangeFrom={(e) => { setFromDate(e.target.value); }} onChangeTo={(e) => {setToDate(e.target.value)}} />
+                <SimpleDateRangePicker onChangeFrom={(e) => { setFromDate(e ? format(e!, 'MM/dd/yyyy') : ''); }} onChangeTo={(e) => { setToDate(e ? format(e!, 'MM/dd/yyyy') : '')}} />
             </div>
             <p>From: {fromDate}</p>
             <p>To: {toDate}</p>
