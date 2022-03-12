@@ -56,6 +56,15 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
 
     onChangeFrom(e: React.ChangeEvent<HTMLInputElement>): void {
         const { onChangeFrom } = this.props;
+
+        let fromDate = new Date(e.target.value);
+
+        if (this.state.toDate !== undefined) {
+            if (fromDate > this.state.toDate) {
+                return; // do nothing
+            }
+        }
+
         if (onChangeFrom && isValid(parse(e.target.value, 'MM/dd/yyyy', new Date()))) {
             onChangeFrom(new Date(e.target.value));
         }
@@ -70,6 +79,14 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
         const { onChangeTo } = this.props;
         if (onChangeTo && isValid(parse(e.target.value, 'MM/dd/yyyy', new Date()))) {
             onChangeTo(new Date(e.target.value));
+        }
+
+        let toDate = new Date(e.target.value);
+
+        if (this.state.fromDate !== undefined) {
+            if (toDate < this.state.fromDate) {
+                return; // do nothing
+            }
         }
 
         this.setState({
