@@ -15,6 +15,7 @@ export interface SimpleDateRangePickerProps {
     onChangeFrom: (date: Date | undefined) => void;
     onChangeTo: (date: Date | undefined) => void;
     daySelectionRangeOptions: DaySelectionRangeOptions;
+    availabilityDateRange: Date[];
 }
 
 export interface SimpleDateRangePickerState {
@@ -123,7 +124,7 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
         return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
     }
 
-    dayClicked(e: React.MouseEvent<HTMLDivElement, MouseEvent>, day: number, date: Date): void {
+    dayClicked(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, day: number, date: Date): void {
 
         let newDate = new Date(date);
         newDate.setDate(day);
@@ -266,7 +267,7 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
         ];
 
         return (
-            <div id="parentElement" ref={this.state.calendarRef} style={{ width: '500px' }}>
+            <div ref={this.state.calendarRef} style={{ width: '500px' }}>
                 <InputMask mask="99/99/9999" onChange={(e) => this.onChangeFrom(e)} value={this.state.fromDateValue}>
                     {() => <TextField id="outlined-basic" label="From" variant="outlined" />}
                 </InputMask>
@@ -309,20 +310,21 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                                             {
                                                 week.map(day => {
                                                     let date = new Date(this.state.currentCalendarDate);
+                                                    date.setDate(day);
+
+                                                    let insideAvailability = date >= this.props.availabilityDateRange[0] && date <= this.props.availabilityDateRange[1];
 
                                                     let doesntStartSunday = index == 0 && week[0] > 10 && day > 10;
-
-                                                    date.setDate(day);
                                                     let dateFormatted = date ? format(date, 'MM/dd/yyyy') : undefined;
 
                                                     let fromDateFormatted = this.state.fromDate && isValid(this.state.fromDate) ? format(this.state.fromDate, 'MM/dd/yyyy') : undefined;
                                                     let toDateFormatted = this.state.toDate && isValid(this.state.toDate) ? format(this.state.toDate, 'MM/dd/yyyy') : undefined;
 
-                                                    return <Paper key={day} onClick={(e) => { this.dayClicked(e, day, this.state.currentCalendarDate) }} variant="outlined" style={{
+                                                    return <Button disabled={!insideAvailability} key={day} onClick={(e) => { this.dayClicked(e, day, this.state.currentCalendarDate) }} variant="outlined" style={{
                                                         backgroundColor: dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? '#265b5f' :
                                                             this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? '#1EA1A1' : '#fff',
-                                                        display: 'inline-block', width: '36px', height: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
-                                                    }}>{day}</Paper>
+                                                        display: 'inline-block', padding: '0px', maxWidth: '36px', maxHeight: '36px', minWidth: '36px', minHeight: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
+                                                    }}>{day}</Button>
                                                 })
                                             }
                                         </div>
@@ -351,20 +353,21 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                                         {
                                             week.map(day => {
                                                 let date = new Date(this.state.nextCalendarDate);
+                                                date.setDate(day);
 
                                                 let doesntStartSunday = index == 0 && week[0] > 10 && day > 10;
+                                                let insideAvailability = date >= this.props.availabilityDateRange[0] && date <= this.props.availabilityDateRange[1];
 
-                                                date.setDate(day);
                                                 let dateFormatted = date ? format(date, 'MM/dd/yyyy') : undefined;
 
                                                 let fromDateFormatted = this.state.fromDate && isValid(this.state.fromDate) ? format(this.state.fromDate, 'MM/dd/yyyy') : undefined;
                                                 let toDateFormatted = this.state.toDate && isValid(this.state.toDate) ? format(this.state.toDate, 'MM/dd/yyyy') : undefined;
 
-                                                return <Paper key={day} onClick={(e) => { this.dayClicked(e, day, this.state.nextCalendarDate) }} variant="outlined" style={{
+                                                return <Button disabled={!insideAvailability} key={day} onClick={(e) => { this.dayClicked(e, day, this.state.nextCalendarDate) }} variant="outlined" style={{
                                                     backgroundColor: dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? '#265b5f' :
                                                         this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? '#1EA1A1' : '#fff',
-                                                    display: 'inline-block', width: '36px', height: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
-                                                }}>{day}</Paper>
+                                                    display: 'inline-block', padding: '0px', maxWidth: '36px', maxHeight: '36px', minWidth: '36px', minHeight: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
+                                                }}>{day}</Button>
                                             })
                                         }
                                     </div>

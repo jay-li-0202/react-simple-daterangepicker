@@ -1,21 +1,25 @@
 import React from 'react';
 import './App.css';
 import SimpleDateRangePicker, { DaySelectionRangeOptions } from './SimpleDateRangePicker';
-import { format } from 'date-fns';
-import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
+import { format, parse, isValid } from 'date-fns';
+import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from '@mui/material';
+import InputMask from "react-input-mask";
 
 function App() {
     const [fromDate, setFromDate] = React.useState<string>("");
     const [toDate, setToDate] = React.useState<string>("");
     const [daySelectionRangeOptions, setDaySelectionRangeOptions] = React.useState<DaySelectionRangeOptions>(DaySelectionRangeOptions.ExtendToAfterTwoClicks);
+    let now = new Date();
+    const [availabilityDateRange, setAvailabilityDateRange] = React.useState<Date[]>([new Date(), new Date(now.getFullYear(), now.getMonth() + 6, 1)]);
 
     return (
         <>
             <div style={{ padding: '24px' }}>
                 <h1>Simple Date Range Picker</h1>
                 <h2>Options</h2>
+                <h3>Day Selection Range</h3>
                 <FormControl>
-                    <FormLabel id="demo-radio-buttons-group-label">Day Selection Range Options</FormLabel>
+                    <FormLabel id="demo-radio-buttons-group-label">Options</FormLabel>
                     <RadioGroup
                         aria-labelledby="demo-radio-buttons-group-label"
                         defaultValue="0"
@@ -26,10 +30,17 @@ function App() {
                         <FormControlLabel value="1" control={<Radio />} label="Reset From After Two Clicks" />
                     </RadioGroup>
                 </FormControl>
+                <h3>Availability Date Range</h3>
+                <InputMask mask="99/99/9999" onChange={(e) => availabilityOnChangeFrom(e)} value={format(availabilityDateRange[0], 'MM/dd/yyyy')}>
+                    {() => <TextField id="outlined-basic" label="From" variant="outlined" />}
+                </InputMask>
+                <InputMask mask="99/99/9999" onChange={(e) => availabilityOnChangeTo(e)} value={format(availabilityDateRange[1], 'MM/dd/yyyy')}>
+                    {() => <TextField id="outlined-basic" label="To" variant="outlined" />}
+                </InputMask>
             </div>
             <div style={{ padding: '24px' }}>
                 <h2>Picker</h2>
-                <SimpleDateRangePicker daySelectionRangeOptions={daySelectionRangeOptions} onChangeFrom={(e) => { setFromDate(e ? format(e!, 'MM/dd/yyyy') : ''); }} onChangeTo={(e) => { setToDate(e ? format(e!, 'MM/dd/yyyy') : '')}} />
+                <SimpleDateRangePicker availabilityDateRange={availabilityDateRange} daySelectionRangeOptions={daySelectionRangeOptions} onChangeFrom={(e) => { setFromDate(e ? format(e!, 'MM/dd/yyyy') : ''); }} onChangeTo={(e) => { setToDate(e ? format(e!, 'MM/dd/yyyy') : '')}} />
             </div>
 
             <div style={{ padding: '24px' }}>
@@ -39,6 +50,22 @@ function App() {
             </div>
         </>
     );
+
+    function availabilityOnChangeFrom(e: React.ChangeEvent<HTMLInputElement>): void {
+        if (!isValid(parse(e.target.value, 'MM/dd/yyyy', new Date()))) {
+            return;
+        }
+
+        setAvailabilityDateRange([new Date(e.target.value), availabilityDateRange[1]])
+    }
+
+    function availabilityOnChangeTo(e: React.ChangeEvent<HTMLInputElement>): void {
+        if (!isValid(parse(e.target.value, 'MM/dd/yyyy', new Date()))) {
+            return;
+        }
+
+        setAvailabilityDateRange([availabilityDateRange[0], new Date(e.target.value)])
+    }
 
     function optionsOnChange(e: React.ChangeEvent<HTMLInputElement>): void {
         let option: DaySelectionRangeOptions = parseInt(e.target.value);
