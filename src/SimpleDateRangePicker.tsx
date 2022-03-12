@@ -4,6 +4,7 @@ import InputMask from "react-input-mask";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import React from 'react';
+import { format } from 'date-fns';
 
 export interface SimpleDateRangePickerProps {
     onChangeFrom: ChangeEventHandler<HTMLInputElement>;
@@ -98,23 +99,39 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
     }
 
     dayClicked(e: React.MouseEvent<HTMLDivElement, MouseEvent>, day: number): void {
-        if (this.state.fromDate !== undefined) {
-            let fromDate = this.state.currentCalendarDate;
-            fromDate.setDate(day);
 
-            this.setState({
-                fromDate: fromDate,
-                fromDateValue: fromDate.toString()
-            });
+        let newDate = new Date(this.state.currentCalendarDate);
+        newDate.setDate(day);
+
+        if (this.state.fromDate !== undefined && this.state.toDate !== undefined) {
+            if (newDate > this.state.toDate) {
+                this.setState({
+                    toDate: newDate,
+                    toDateValue: format(newDate, 'MM/dd/yyyy')
+                });
+            }
+            else {
+                this.setState({
+                    fromDate: newDate,
+                    fromDateValue: format(newDate, 'MM/dd/yyyy'),
+                    toDate: undefined,
+                    toDateValue: ''
+                });
+            }
         }
         else {
-            let toDate = this.state.currentCalendarDate;
-            toDate.setDate(day);
-
-            this.setState({
-                toDate: toDate,
-                toDateValue: toDate.toString()
-            });
+            if (this.state.fromDate === undefined) {
+                this.setState({
+                    fromDate: newDate,
+                    fromDateValue: format(newDate, 'MM/dd/yyyy')
+                });
+            }
+            else {
+                this.setState({
+                    toDate: newDate,
+                    toDateValue: format(newDate, 'MM/dd/yyyy')
+                });
+            }
         }
     }
 
