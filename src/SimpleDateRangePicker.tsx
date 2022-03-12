@@ -275,24 +275,33 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                     {() => <TextField id="outlined-basic" label="To" variant="outlined" />}
                 </InputMask>
 
-                <Paper style={{ padding: '24px', width: '600px', textAlign: 'center', display: this.state.showCalendar ? 'block' : 'none' }}>
-                    <div style={{ float: 'left', width: '100%' }}>
-                        <Button onClick={(e) => { this.calendarNavigateBack(e) }} style={{ float: 'left' }}>
-                            <NavigateBeforeIcon />
+                <Paper style={{ padding: '24px', width: '600px', textAlign: 'center', display: this.state.showCalendar ? 'block' : 'none', position: 'relative' }}>
+                    <div style={{ width: '100%', position: 'relative', display: 'flex' }}>
+                        <Button onClick={(e) => { this.calendarNavigateBack(e) }} style={{ display: 'inline-block', marginLeft: '0' }}>
+                            <NavigateBeforeIcon style={{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }} />
                         </Button>
-                        <span style={{ fontWeight: '700', marginRight: '30%' }}>
+                        <span style={{ fontWeight: '700', display: 'inline-block', flex: '25%', paddingTop: '6px', textAlign: 'center' }}>
                             {this.state.currentCalendarDate.toLocaleString('default', { month: 'long' })} {this.state.currentCalendarDate.toLocaleString('default', { year: 'numeric' })}
                         </span>
-                        <span style={{ fontWeight: '700' }}>
+                        <Button style={{ display: 'inline-block', margin: '0 auto' }} onClick={() => {
+                            let now = new Date();
+                            this.setState({
+                                currentCalendarDate: new Date(),
+                                nextCalendarDate: new Date(now.getFullYear(), now.getMonth() + 1, 1),
+                            });
+                        }}>
+                            Today
+                        </Button>
+                        <span style={{ fontWeight: '700', display: 'inline-block', flex: '25%', paddingTop: '6px', marginRight: '0', textAlign: 'center'}}>
                             {this.state.nextCalendarDate.toLocaleString('default', { month: 'long' })} {this.state.nextCalendarDate.toLocaleString('default', { year: 'numeric' })}
                         </span>
-                        <Button onClick={(e) => { this.calendarNavigateNext(e) }} style={{ float: 'right' }}>
-                            <NavigateNextIcon />
+                        <Button onClick={(e) => { this.calendarNavigateNext(e) }} style={{ display: 'inline-block', marginRight: '0'}}>
+                            <NavigateNextIcon style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }} />
                         </Button>
                     </div>
 
                     {/*Current Calendar*/}
-                    <div style={{ display: 'inline-block', padding: '12px' }}>
+                    <div style={{ display: 'inline-block', padding: '12px', verticalAlign: 'top' }}>
                         <div style={{ display: 'block' }}>
                         {
                             weekDayNames.map(name => {
@@ -335,7 +344,7 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                     </div>
 
                     {/*Next Calendar*/}
-                    <div style={{ display: 'inline-block' }}>
+                    <div style={{ display: 'inline-block', padding: '12px', verticalAlign: 'top' }}>
                         <div style={{ display: 'block' }}>
                         {
                             weekDayNames.map(name => {
@@ -345,7 +354,7 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                             })
                         }
                     </div>
-                        <div style={{ display: 'inline-block' }}>
+                    <div style={{ display: 'inline-block' }}>
                         {
                                 nextCalendarWeeks.map((week, index) => {
                                 return (
@@ -375,17 +384,6 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                             })
                         }
                     </div>
-                    </div>
-                    <div style={{ display: 'block' }}>
-                        <Button onClick={() => {
-                            let now = new Date();
-                            this.setState({
-                                currentCalendarDate: new Date(),
-                                nextCalendarDate: new Date(now.getFullYear(), now.getMonth() + 1, 1),
-                            });
-                        }}>
-                            Today
-                        </Button>
                     </div>
                 </Paper>
             </div>
