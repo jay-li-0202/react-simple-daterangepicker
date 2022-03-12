@@ -2,6 +2,7 @@
   "name": "simple-daterangepicker",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://joemoceri.github.io/simple-daterangepicker/",
   "dependencies": {
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
