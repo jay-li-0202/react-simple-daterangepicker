@@ -185,7 +185,7 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                     onChangeFrom(newDate);
                 }
             }
-            else if (this.state.fromDate?.getDate() < day && this.state.fromDate.getMonth() <= date.getMonth() && this.state.fromDate.getFullYear() <= date.getFullYear()) {
+            else if (this.state.fromDate < newDate) {
                 this.setState({
                     toDate: newDate,
                     toDateValue: format(newDate, 'MM/dd/yyyy')
