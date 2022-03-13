@@ -11,7 +11,11 @@ function App() {
     const [toDate, setToDate] = React.useState<string>("");
     const [daySelectionRangeOptions, setDaySelectionRangeOptions] = React.useState<DaySelectionRangeOptions>(DaySelectionRangeOptions.ExtendToAfterTwoClicks);
     let now = new Date();
-    const [availabilityDateRange, setAvailabilityDateRange] = React.useState<Date[]>([new Date(), new Date(now.getFullYear(), now.getMonth() + 6, 1)]);
+    now.setHours(0, 0, 0, 0);
+    let next = new Date(now.getFullYear(), now.getMonth() + 6, 1);
+    next.setHours(0, 0, 0, 0);
+
+    const [availabilityDateRange, setAvailabilityDateRange] = React.useState<Date[]>([now, next]);
 
     const [simpleDateRangeColors, setSimpleDateRangeColors] = React.useState<SimpleDateRangeColors>({
         dayInsideRangeSelected: '#1EA1A1',
@@ -149,7 +153,10 @@ function App() {
             return;
         }
 
-        setAvailabilityDateRange([new Date(e.target.value), availabilityDateRange[1]])
+        let date = new Date(e.target.value);
+        date.setHours(0, 0, 0, 0);
+
+        setAvailabilityDateRange([date, availabilityDateRange[1]])
     }
 
     function availabilityOnChangeTo(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -157,7 +164,10 @@ function App() {
             return;
         }
 
-        setAvailabilityDateRange([availabilityDateRange[0], new Date(e.target.value)])
+        let date = new Date(e.target.value);
+        date.setHours(0, 0, 0, 0);
+
+        setAvailabilityDateRange([availabilityDateRange[0], date])
     }
 
     function optionsOnChange(e: React.ChangeEvent<HTMLInputElement>): void {

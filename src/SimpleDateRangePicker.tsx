@@ -333,9 +333,10 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                                                 week.map(day => {
                                                     let date = new Date(this.state.currentCalendarDate);
                                                     date.setDate(day);
+                                                    date.setHours(0, 0, 0, 0);
 
                                                     let insideAvailability = date >= this.props.availabilityDateRange[0] && date <= this.props.availabilityDateRange[1];
-
+                                                    
                                                     let doesntStartSunday = index == 0 && week[0] > 10 && day > 10;
                                                     let dateFormatted = date ? format(date, 'MM/dd/yyyy') : undefined;
 
@@ -377,11 +378,12 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                                         {
                                             week.map(day => {
                                                 let date = new Date(this.state.nextCalendarDate);
+                                                date.setHours(0, 0, 0, 0);
                                                 date.setDate(day);
 
                                                 let doesntStartSunday = index == 0 && week[0] > 10 && day > 10;
                                                 let insideAvailability = date >= this.props.availabilityDateRange[0] && date <= this.props.availabilityDateRange[1];
-
+                                                
                                                 let dateFormatted = date ? format(date, 'MM/dd/yyyy') : undefined;
 
                                                 let fromDateFormatted = this.state.fromDate && isValid(this.state.fromDate) ? format(this.state.fromDate, 'MM/dd/yyyy') : undefined;
