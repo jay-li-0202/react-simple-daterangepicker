@@ -11,11 +11,24 @@ export enum DaySelectionRangeOptions {
     ResetFromAterTwoClicks = 1
 }
 
+export interface SimpleDateRangeColors {
+    dayInsideRangeSelected: string;
+    fromToDaySelected: string;
+    dayNotSelected: string;
+    dayTextColor: string;
+    dayBorderColor: string;
+    disabledDayTextColor: string;
+    disabledDayBorderColor: string;
+    disabledDayBackgroundColor: string;
+}
+
 export interface SimpleDateRangePickerProps {
     onChangeFrom: (date: Date | undefined) => void;
     onChangeTo: (date: Date | undefined) => void;
     daySelectionRangeOptions: DaySelectionRangeOptions;
     availabilityDateRange: Date[];
+    simpleDateRangeColors: SimpleDateRangeColors;
+
 }
 
 export interface SimpleDateRangePickerState {
@@ -330,8 +343,10 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                                                     let toDateFormatted = this.state.toDate && isValid(this.state.toDate) ? format(this.state.toDate, 'MM/dd/yyyy') : undefined;
 
                                                     return <Button disabled={!insideAvailability} key={day} onClick={(e) => { this.dayClicked(e, day, this.state.currentCalendarDate) }} variant="outlined" style={{
-                                                        backgroundColor: dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? '#265b5f' :
-                                                            this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? '#1EA1A1' : '#fff',
+                                                        color: !insideAvailability ? this.props.simpleDateRangeColors.disabledDayTextColor : this.props.simpleDateRangeColors.dayTextColor,
+                                                        borderColor: !insideAvailability ? this.props.simpleDateRangeColors.disabledDayBorderColor : this.props.simpleDateRangeColors.dayBorderColor,
+                                                        backgroundColor: !insideAvailability ? this.props.simpleDateRangeColors.disabledDayBackgroundColor : dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? this.props.simpleDateRangeColors.fromToDaySelected :
+                                                            this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? this.props.simpleDateRangeColors.dayInsideRangeSelected : this.props.simpleDateRangeColors.dayNotSelected,
                                                         display: 'inline-block', padding: '0px', maxWidth: '36px', maxHeight: '36px', minWidth: '36px', minHeight: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
                                                     }}>{day}</Button>
                                                 })
@@ -373,8 +388,10 @@ export default class SimpleDateRangePicker extends Component<SimpleDateRangePick
                                                 let toDateFormatted = this.state.toDate && isValid(this.state.toDate) ? format(this.state.toDate, 'MM/dd/yyyy') : undefined;
 
                                                 return <Button disabled={!insideAvailability} key={day} onClick={(e) => { this.dayClicked(e, day, this.state.nextCalendarDate) }} variant="outlined" style={{
-                                                    backgroundColor: dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? '#265b5f' :
-                                                        this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? '#1EA1A1' : '#fff',
+                                                    color: !insideAvailability ? this.props.simpleDateRangeColors.disabledDayTextColor : this.props.simpleDateRangeColors.dayTextColor,
+                                                    borderColor: !insideAvailability ? this.props.simpleDateRangeColors.disabledDayBorderColor : this.props.simpleDateRangeColors.dayBorderColor,
+                                                    backgroundColor: !insideAvailability ? this.props.simpleDateRangeColors.disabledDayBackgroundColor : dateFormatted == fromDateFormatted || dateFormatted == toDateFormatted ? this.props.simpleDateRangeColors.fromToDaySelected :
+                                                        this.state.fromDate && this.state.toDate && date > this.state.fromDate && date < this.state.toDate ? this.props.simpleDateRangeColors.dayInsideRangeSelected : this.props.simpleDateRangeColors.dayNotSelected,
                                                     display: 'inline-block', padding: '0px', maxWidth: '36px', maxHeight: '36px', minWidth: '36px', minHeight: '36px', textAlign: 'center', visibility: doesntStartSunday ? "hidden" : "visible"
                                                 }}>{day}</Button>
                                             })
