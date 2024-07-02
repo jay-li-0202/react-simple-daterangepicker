@@ -10,6 +10,7 @@ function App() {
     const [fromDate, setFromDate] = React.useState<string>("");
     const [toDate, setToDate] = React.useState<string>("");
     const [daySelectionRangeOptions, setDaySelectionRangeOptions] = React.useState<DaySelectionRangeOptions>(DaySelectionRangeOptions.ExtendToAfterTwoClicks);
+    // set the availability by default to be today and six months from now.
     let now = new Date();
     now.setHours(0, 0, 0, 0);
     let next = new Date(now.getFullYear(), now.getMonth() + 6, 1);
@@ -17,8 +18,10 @@ function App() {
 
     const [availabilityDateRange, setAvailabilityDateRange] = React.useState<Date[]>([now, next]);
 
+    // default set of colors
     const [simpleDateRangeColors, setSimpleDateRangeColors] = React.useState<SimpleDateRangeColors>({
         dayInsideRangeSelected: '#1EA1A1',
+        dayInsideRangeHighlight: '#6CE1E1',
         fromToDaySelected: '#265b5f',
         dayNotSelected: '#fff',
         dayTextColor: '#000',
@@ -37,11 +40,14 @@ function App() {
                     <SimpleDateRangePicker simpleDateRangeColors={simpleDateRangeColors} availabilityDateRange={availabilityDateRange} daySelectionRangeOptions={daySelectionRangeOptions} onChangeFrom={(e) => { setFromDate(e ? format(e!, 'MM/dd/yyyy') : ''); }} onChangeTo={(e) => { setToDate(e ? format(e!, 'MM/dd/yyyy') : '') }} />
                 </div>
 
+                {/* Show the output from the date range picker */}
                 <div style={{ padding: '24px' }}>
                     <h2>Output</h2>
                     <p><strong>From:</strong> {fromDate}</p>
                     <p><strong>To:</strong> {toDate}</p>
                 </div>
+
+                {/* The options for determining the behavior of the date range picker */}
                 <h2>Options</h2>
                 <h3>Day Selection Range</h3>
                 <FormControl>
@@ -54,8 +60,11 @@ function App() {
                     >
                         <FormControlLabel value="0" control={<Radio />} label="Extend To After Two Clicks" />
                         <FormControlLabel value="1" control={<Radio />} label="Reset From After Two Clicks" />
+                        <FormControlLabel value="2" control={<Radio />} label="Bidirectional Reset From After Two Clicks" />
                     </RadioGroup>
                 </FormControl>
+
+                {/* The dates the date range picker has available */}
                 <h3>Availability Date Range</h3>
                 <InputMask mask="99/99/9999" onChange={(e) => availabilityOnChangeFrom(e)} value={format(availabilityDateRange[0], 'MM/dd/yyyy')}>
                     {() => <TextField id="outlined-basic" label="From" variant="outlined" />}
@@ -63,6 +72,8 @@ function App() {
                 <InputMask mask="99/99/9999" onChange={(e) => availabilityOnChangeTo(e)} value={format(availabilityDateRange[1], 'MM/dd/yyyy')}>
                     {() => <TextField id="outlined-basic" label="To" variant="outlined" />}
                 </InputMask>
+
+                {/* The colors used to customize the look of the date range picker, we use the SketchPicker component to achieve this */}
                 <h3>Colors</h3>
                 <div style={{ display: 'inline-block', padding: '12px' }}>
                     <h4>Day Inside Range Selected Color</h4>
@@ -75,14 +86,24 @@ function App() {
                     }} />
                 </div>
                 <div style={{ display: 'inline-block', padding: '12px' }}>
-                <h4>From / To Day Selected Color</h4>
-                <SketchPicker color={simpleDateRangeColors.fromToDaySelected} onChange={(color, e) => {
-                    let r = {
-                        ...simpleDateRangeColors,
-                        fromToDaySelected: color.hex
-                    };
-                    setSimpleDateRangeColors(r)
-                }} />
+                    <h4>From / To Day Selected Color</h4>
+                    <SketchPicker color={simpleDateRangeColors.fromToDaySelected} onChange={(color, e) => {
+                        let r = {
+                            ...simpleDateRangeColors,
+                            fromToDaySelected: color.hex
+                        };
+                        setSimpleDateRangeColors(r)
+                    }} />
+                </div>
+                <div style={{ display: 'inline-block', padding: '12px' }}>
+                    <h4>Day Inside Range Highlight Color</h4>
+                    <SketchPicker color={simpleDateRangeColors.dayInsideRangeHighlight} onChange={(color, e) => {
+                        let r = {
+                            ...simpleDateRangeColors,
+                            dayInsideRangeHighlight: color.hex
+                        };
+                        setSimpleDateRangeColors(r)
+                    }} />
                 </div>
                 <div style={{ display: 'inline-block', padding: '12px' }}>
                 <h4>Day Not Selected Color</h4>
